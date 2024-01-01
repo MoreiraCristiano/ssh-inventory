@@ -81,7 +81,7 @@ class Menu:
         """
         Description: Instantiates the InventoryHandle class, retrieves the names of all collections, and presents a menu with the names of the collections.
         Params:
-        Return: The option choosed (Should be a collection name)
+        Return: The option choosed (Should be a collection name) or -1 if has no collection in database
         """
         inventory = InventoryHandle()
 
