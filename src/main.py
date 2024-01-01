@@ -87,7 +87,7 @@ class Menu:
             tprint('SSH-INVENTORY', font='small')
 
         choice = inquirer.select(
-            message='Choose an option', choices=['Add new host', 'Collections', 'Exit']
+            message='Choose an option:', choices=['Add new host', 'Collections', 'Exit']
         ).execute()
 
         match choice:
@@ -96,7 +96,7 @@ class Menu:
             case 'Collections':
                 self.collections()
             case 'Exit':
-                confirm = inquirer.confirm(message='Exit?').execute()
+                confirm = inquirer.confirm(message='Exit:').execute()
                 if confirm:
                     return choice
                 else:
@@ -114,13 +114,13 @@ class Menu:
         ip = inquirer.text(message="IP:").execute()
         collection = inquirer.text(message="Collection:").execute()
 
-        confirm = inquirer.confirm(message="Confirm?").execute()
+        confirm = inquirer.confirm(message="Confirm:").execute()
         if confirm:
             commander = Commands()
             commander.add_new_host(conn_name, user, ip, collection)
         else:
             choice = inquirer.select(
-                message='What do you want to do?', choices=['Back to main menu', 'Add new host']
+                message='What do you want to do:', choices=['Back to main menu', 'Add new host']
             ).execute()
 
             if choice == 'Back to main menu':
@@ -140,7 +140,7 @@ class Menu:
         try:
             collections = inventory.get_distinct_collections_name()
             choice = inquirer.select(
-                message='Choose a collection', choices=sorted(collections)
+                message='Choose a collection:', choices=sorted(collections)
             ).execute()
 
             return choice
