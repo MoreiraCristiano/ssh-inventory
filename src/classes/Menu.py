@@ -20,23 +20,36 @@ class Menu:
         """
         if logo:
             tprint('SSH-INVENTORY', font='small')
+        try:
+            choice = inquirer.select(
+                message='Choose an option:',
+                choices=['Add new host', 'Collections', 'Exit'],
+            ).execute()
 
-        choice = inquirer.select(
-            message='Choose an option:', choices=['Add new host', 'Collections', 'Exit']
-        ).execute()
+            match choice:
+                case 'Add new host':
+                    self.add_new_host()
+                case 'Collections':
+                    self.collections()
+                case 'Exit':
+                    self.exit()
+            return choice
+        except KeyboardInterrupt:
+            print('Bye')
+            return 0
 
-        match choice:
-            case 'Add new host':
-                self.add_new_host()
-            case 'Collections':
-                self.collections()
-            case 'Exit':
-                confirm = inquirer.confirm(message='Exit:').execute()
-                if confirm:
-                    return choice
-                else:
-                    self.main_menu()
-        return choice
+    def exit(self):
+        """
+        Description:
+        Parameters:
+        Return: Default 0
+        """
+        confirm = inquirer.confirm(message='Exit:').execute()
+        if confirm:
+            print('Bye')
+        else:
+            self.main_menu()
+        return 0
 
     def add_new_host(self):
         """
