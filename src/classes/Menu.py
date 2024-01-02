@@ -68,6 +68,7 @@ class Menu:
         confirm = inquirer.confirm(message="Confirm:").execute()
         if confirm:
             self.commander.add_new_host(conn_name, user, ip, collection)
+            self.main_menu()
         else:
             choice = inquirer.select(
                 message='What do you want to do:', choices=['Back to main menu', 'Add new host']
@@ -129,6 +130,7 @@ class Menu:
         """
         try:
             self.commander.connect_to_host(host.user, host.ip)
+            self.main_menu(logo=True)
         except Exception:
             return -1
 
