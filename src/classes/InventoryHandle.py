@@ -48,13 +48,16 @@ class InventoryHandle:
         """
         Description: Obtain hosts filtering by collection
         Params: The collection name
-        Return: Default 0
+        Return: List with all hosts in the collection or -1 if has no hosts in the collection
         """
         session = Session(engine)
-        stmt = select(Host).where(Host.collection.in_([collection]))
-        for name in session.scalars(stmt):
-            print(name)
-        return 0
+        try:
+            stmt = select(Host).where(Host.collection.in_([collection]))
+            hosts = list(session.scalars(stmt))
+
+            return hosts
+        except Exception:
+            return -1
 
     def get_distinct_collections_name(self):
         """

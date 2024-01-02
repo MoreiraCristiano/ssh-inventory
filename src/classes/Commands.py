@@ -1,5 +1,6 @@
 from os import system
 from .InventoryHandle import InventoryHandle
+import subprocess
 
 
 class Commands:
@@ -16,8 +17,9 @@ class Commands:
         Parameters: user for ssh connection and ip
         Return: Default 0
         """
+
         ssh_session = f'ssh {user}@{ip}'
-        system(f'pwsh ../shell_scripts/ssh_conn.ps1 "{ssh_session}"')
+        system(f'pwsh.exe ./shell_scripts/ssh_conn.ps1 "{ssh_session}"')
 
         return 0
 

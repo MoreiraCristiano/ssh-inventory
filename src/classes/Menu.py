@@ -9,6 +9,9 @@ class Menu:
     Descripttion: Render and handle user options
     """
 
+    inventory = InventoryHandle()
+    commander = Commands()
+
     def __init__(self):
         pass
 
@@ -64,8 +67,7 @@ class Menu:
 
         confirm = inquirer.confirm(message="Confirm:").execute()
         if confirm:
-            commander = Commands()
-            commander.add_new_host(conn_name, user, ip, collection)
+            self.commander.add_new_host(conn_name, user, ip, collection)
         else:
             choice = inquirer.select(
                 message='What do you want to do:', choices=['Back to main menu', 'Add new host']
@@ -83,16 +85,51 @@ class Menu:
         Params:
         Return: The option choosed (Should be a collection name) or -1 if has no collection in database
         """
-        inventory = InventoryHandle()
 
         try:
-            collections = inventory.get_distinct_collections_name()
-            choice = inquirer.select(
+            collections = self.inventory.get_distinct_collections_name()
+            collection_choice = inquirer.select(
                 message='Choose a collection:', choices=sorted(collections)
             ).execute()
 
-            return choice
+            self.hosts_by_collection(collection_choice)
+
+            return collection_choice
         except Exception:
             print('None collections found')
             self.main_menu()
             return -1
+
+    def hosts_by_collection(self, collection):
+        """
+        Description: This function receive a collection and get all hosts under then
+        Parameters: collection: The queried collection
+        Return: The host choosed by user
+        """
+
+        hosts = self.inventory.get_hosts_by_collection(collection)
+
+        host_choice = inquirer.select(
+            message='Choose a host:', choices=[host.conn_name for host in hosts]
+        ).execute()
+
+        if hosts != -1:
+            for host in hosts:
+                if host.conn_name == host_choice:
+                    self.connect_to_host(host)
+                    return host_choice
+        else:
+            return -1
+
+    def connect_to_host(self, host):
+        """
+        Description: Call a command class to connect to a host ssh via
+        Parameters: Host object
+        Return: 0 if success or -1 if fails
+        """
+        try:
+            self.commander.connect_to_host(host.user, host.ip)
+        except Exception:
+            return -1
+
+        return 0
