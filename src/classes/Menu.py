@@ -70,7 +70,11 @@ class Menu:
 
         confirm = inquirer.confirm(message="Confirm:").execute()
         if confirm:
-            self.commander.add_new_host(conn_name, user, ip, collection)
+            try:
+                self.commander.add_new_host(conn_name, user, ip, collection)
+            except Exception:
+                print('Name already exists')
+                self.main_menu()
             self.main_menu()
         else:
             choice = inquirer.select(
