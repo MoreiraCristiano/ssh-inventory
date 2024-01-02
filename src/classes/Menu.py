@@ -6,7 +6,7 @@ from .InventoryHandle import InventoryHandle
 
 class Menu:
     """
-    Descripttion: Render and handle user options
+    Description: Render and handle user options
     """
 
     inventory = InventoryHandle()
