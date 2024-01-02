@@ -2,6 +2,7 @@ from art import tprint
 from InquirerPy import inquirer
 from .Commands import Commands
 from .InventoryHandle import InventoryHandle
+from InquirerPy.validator import EmptyInputValidator
 
 
 class Menu:
@@ -60,10 +61,12 @@ class Menu:
         Params:
         Return: 0 if success
         """
-        conn_name = inquirer.text(message="Connection name:").execute()
-        user = inquirer.text(message="Username:").execute()
-        ip = inquirer.text(message="IP:").execute()
-        collection = inquirer.text(message="Collection:").execute()
+        conn_name = inquirer.text(
+            message="Connection name:", validate=EmptyInputValidator()
+        ).execute()
+        user = inquirer.text(message="Username:", validate=EmptyInputValidator()).execute()
+        ip = inquirer.text(message="IP:", validate=EmptyInputValidator()).execute()
+        collection = inquirer.text(message="Collection:", validate=EmptyInputValidator()).execute()
 
         confirm = inquirer.confirm(message="Confirm:").execute()
         if confirm:
