@@ -15,7 +15,7 @@ class Host(Base):
     conn_name: Mapped[str] = mapped_column(String(30), unique=True, nullable=False)
     user: Mapped[str] = mapped_column(String(50), nullable=False)
     ip: Mapped[str] = mapped_column(String(25), nullable=False)
-    collection: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    collection: Mapped[str] = mapped_column(String(50), nullable=False)
 
     def __repr__(self):
         return f'Host(id={self.id!r}, conn_name={self.conn_name!r}, user={self.user!r}, ip={self.ip!r}, collection={self.collection!r})'
