@@ -12,6 +12,7 @@ class Menu:
 
     inventory = InventoryHandle()
     commander = Commands()
+    screens = {'collections': 'Collections', 'main_menu': 'Main Menu'}
 
     def __init__(self):
         pass
@@ -39,7 +40,7 @@ class Menu:
                     self.exit()
             return choice
         except KeyboardInterrupt:
-            print('Bye')
+            self.exit()
             return 0
 
     def exit(self):
@@ -48,12 +49,16 @@ class Menu:
         Parameters:
         Return: Default 0
         """
-        confirm = inquirer.confirm(message='Exit:').execute()
-        if confirm:
+        try:
+            confirm = inquirer.confirm(message='Exit:').execute()
+            if confirm:
+                print('Bye')
+            else:
+                self.main_menu()
+                return 0
+        except KeyboardInterrupt:
             print('Bye')
-        else:
-            self.main_menu()
-        return 0
+            return 0
 
     def add_new_host(self):
         """
@@ -64,11 +69,15 @@ class Menu:
         conn_name = inquirer.text(
             message="Connection name:", validate=EmptyInputValidator()
         ).execute()
+
         user = inquirer.text(message="Username:", validate=EmptyInputValidator()).execute()
+
         ip = inquirer.text(message="IP:", validate=EmptyInputValidator()).execute()
+
         collection = inquirer.text(message="Collection:", validate=EmptyInputValidator()).execute()
 
         confirm = inquirer.confirm(message="Confirm:").execute()
+
         if confirm:
             try:
                 self.commander.add_new_host(conn_name, user, ip, collection)
@@ -95,16 +104,22 @@ class Menu:
         """
 
         try:
-            collections = self.inventory.get_distinct_collections_name()
+            collections = sorted(self.inventory.get_distinct_collections_name())
+            collections.append('Back')
+
             collection_choice = inquirer.select(
-                message='Choose a collection:', choices=sorted(collections)
+                message='Choose a collection:', choices=collections
             ).execute()
+
+            if collection_choice == 'Back':
+                self.back_to_screen(self.screens['main_menu'])
+                return collection_choice
 
             self.hosts_by_collection(collection_choice)
 
             return collection_choice
         except Exception:
-            print('None collections found')
+            print('[-] None collections found')
             self.main_menu()
             return -1
 
@@ -116,10 +131,14 @@ class Menu:
         """
 
         hosts = self.inventory.get_hosts_by_collection(collection)
+        choices = [host.conn_name for host in hosts]
+        choices.append('Back')
 
-        host_choice = inquirer.select(
-            message='Choose a host:', choices=[host.conn_name for host in hosts]
-        ).execute()
+        host_choice = inquirer.select(message='Choose a host:', choices=choices).execute()
+
+        if host_choice == 'Back':
+            self.back_to_screen(self.screens['collections'])
+            return host_choice
 
         if hosts != -1:
             for host in hosts:
@@ -128,6 +147,21 @@ class Menu:
                     return host_choice
         else:
             return -1
+
+    def back_to_screen(self, screen):
+        """
+        Description: This function receive a screen and return to this
+        Parameters: Screen name
+        Return: Default 0
+        """
+
+        match screen:
+            case 'Collections':
+                self.collections()
+            case 'Main Menu':
+                self.main_menu()
+
+        return 0
 
     def connect_to_host(self, host):
         """
