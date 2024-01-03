@@ -12,10 +12,10 @@ class Host(Base):
     __tablename__ = 'hosts'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    conn_name: Mapped[str] = mapped_column(String(30))
-    user: Mapped[str] = mapped_column(String(50))
-    ip: Mapped[str] = mapped_column(String(25))
-    collection: Mapped[str] = mapped_column(String(50))
+    conn_name: Mapped[str] = mapped_column(String(30), unique=True, nullable=False)
+    user: Mapped[str] = mapped_column(String(50), nullable=False)
+    ip: Mapped[str] = mapped_column(String(25), nullable=False)
+    collection: Mapped[str] = mapped_column(String(50), nullable=False)
 
     def __repr__(self):
         return f'Host(id={self.id!r}, conn_name={self.conn_name!r}, user={self.user!r}, ip={self.ip!r}, collection={self.collection!r})'

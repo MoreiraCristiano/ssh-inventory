@@ -1,6 +1,5 @@
 from os import system
 from .InventoryHandle import InventoryHandle
-import subprocess
 
 
 class Commands:
