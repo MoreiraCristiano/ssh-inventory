@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from model.Host import Host, Base
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, delete
 
 engine = create_engine('sqlite:///db_ssh.sqlite3', echo=False)
 Base.metadata.create_all(engine)
@@ -24,12 +24,17 @@ class InventoryHandle:
 
         return 0
 
-    def remove_host(self, conn_name):
+    def remove_host(self, host):
         """
         Description: This function receive the session name and delete from base. Collection too?
-        Parameters:
-        Return:
+        Parameters: Host object
+        Return: Default 0
         """
+
+        with Session(engine) as session:
+            session.delete(host)
+            session.commit()
+
         return 0
 
     def get_all_hosts(self):

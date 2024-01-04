@@ -143,7 +143,7 @@ class Menu:
         if hosts != -1:
             for host in hosts:
                 if host.conn_name == host_choice:
-                    self.connect_to_host(host)
+                    self.host_actions(host)
                     return host_choice
         else:
             return -1
@@ -160,6 +160,28 @@ class Menu:
                 self.collections()
             case 'Main Menu':
                 self.main_menu()
+
+        return 0
+
+    def host_actions(self, host):
+        """
+        Description: Handle choice to host, connect or delete
+        Parameters:
+        Return: 0 if success or -1 if fails
+        """
+        choice = inquirer.select(message='Choose a host:', choices=['Connect', 'Delete']).execute()
+
+        match choice:
+            case 'Connect':
+                self.connect_to_host(host)
+            case 'Delete':
+                confirm = inquirer.confirm(f'Delete {host.conn_name}:').execute()
+
+                if confirm:
+                    self.inventory.remove_host(host)
+                    self.back_to_screen(self.screens['collections'])
+                else:
+                    self.back_to_screen(self.screens['collections'])
 
         return 0
 
