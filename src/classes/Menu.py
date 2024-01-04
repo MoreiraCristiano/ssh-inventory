@@ -66,35 +66,40 @@ class Menu:
         Params:
         Return: 0 if success
         """
-        conn_name = inquirer.text(
-            message="Connection name:", validate=EmptyInputValidator()
-        ).execute()
-
-        user = inquirer.text(message="Username:", validate=EmptyInputValidator()).execute()
-
-        ip = inquirer.text(message="IP:", validate=EmptyInputValidator()).execute()
-
-        collection = inquirer.text(message="Collection:", validate=EmptyInputValidator()).execute()
-
-        confirm = inquirer.confirm(message="Confirm:").execute()
-
-        if confirm:
-            try:
-                self.commander.add_new_host(conn_name, user, ip, collection)
-            except Exception:
-                print('Name already exists')
-                self.main_menu()
-            self.main_menu()
-        else:
-            choice = inquirer.select(
-                message='What do you want to do:', choices=['Back to main menu', 'Add new host']
+        try:
+            conn_name = inquirer.text(
+                message="Connection name:", validate=EmptyInputValidator()
             ).execute()
 
-            if choice == 'Back to main menu':
+            user = inquirer.text(message="Username:", validate=EmptyInputValidator()).execute()
+
+            ip = inquirer.text(message="IP:", validate=EmptyInputValidator()).execute()
+
+            collection = inquirer.text(
+                message="Collection:", validate=EmptyInputValidator()
+            ).execute()
+
+            confirm = inquirer.confirm(message="Confirm:").execute()
+
+            if confirm:
+                try:
+                    self.commander.add_new_host(conn_name, user, ip, collection)
+                except Exception:
+                    print('Name already exists')
+                    self.main_menu()
                 self.main_menu()
-            elif choice == 'Add new host':
-                self.add_new_host()
-        return 0
+            else:
+                choice = inquirer.select(
+                    message='What do you want to do:', choices=['Back to main menu', 'Add new host']
+                ).execute()
+
+                if choice == 'Back to main menu':
+                    self.main_menu()
+                elif choice == 'Add new host':
+                    self.add_new_host()
+            return 0
+        except KeyboardInterrupt:
+            self.back_to_screen(self.screens['main_menu'])
 
     def collections(self):
         """
@@ -102,26 +107,28 @@ class Menu:
         Params:
         Return: The option choosed (Should be a collection name) or -1 if has no collection in database
         """
-
         try:
-            collections = sorted(self.inventory.get_distinct_collections_name())
-            collections.append('Back')
+            try:
+                collections = sorted(self.inventory.get_distinct_collections_name())
+                collections.append('Back')
 
-            collection_choice = inquirer.select(
-                message='Choose a collection:', choices=collections
-            ).execute()
+                collection_choice = inquirer.select(
+                    message='Choose a collection:', choices=collections
+                ).execute()
 
-            if collection_choice == 'Back':
-                self.back_to_screen(self.screens['main_menu'])
+                if collection_choice == 'Back':
+                    self.back_to_screen(self.screens['main_menu'])
+                    return collection_choice
+
+                self.hosts_by_collection(collection_choice)
+
                 return collection_choice
-
-            self.hosts_by_collection(collection_choice)
-
-            return collection_choice
-        except Exception:
-            print('[-] None collections found')
-            self.main_menu()
-            return -1
+            except Exception:
+                print('[-] None collections found')
+                self.main_menu()
+                return -1
+        except KeyboardInterrupt:
+            self.back_to_screen(self.screens['main_menu'])
 
     def hosts_by_collection(self, collection):
         """
@@ -129,24 +136,26 @@ class Menu:
         Parameters: collection: The queried collection
         Return: The host choosed by user
         """
+        try:
+            hosts = self.inventory.get_hosts_by_collection(collection)
+            choices = [host.conn_name for host in hosts]
+            choices.append('Back')
 
-        hosts = self.inventory.get_hosts_by_collection(collection)
-        choices = [host.conn_name for host in hosts]
-        choices.append('Back')
+            host_choice = inquirer.select(message='Choose a host:', choices=choices).execute()
 
-        host_choice = inquirer.select(message='Choose a host:', choices=choices).execute()
+            if host_choice == 'Back':
+                self.back_to_screen(self.screens['collections'])
+                return host_choice
 
-        if host_choice == 'Back':
+            if hosts != -1:
+                for host in hosts:
+                    if host.conn_name == host_choice:
+                        self.host_actions(host)
+                        return host_choice
+            else:
+                return -1
+        except KeyboardInterrupt:
             self.back_to_screen(self.screens['collections'])
-            return host_choice
-
-        if hosts != -1:
-            for host in hosts:
-                if host.conn_name == host_choice:
-                    self.connect_to_host(host)
-                    return host_choice
-        else:
-            return -1
 
     def back_to_screen(self, screen):
         """
@@ -160,6 +169,28 @@ class Menu:
                 self.collections()
             case 'Main Menu':
                 self.main_menu()
+
+        return 0
+
+    def host_actions(self, host):
+        """
+        Description: Handle choice to host, connect or delete
+        Parameters:
+        Return: 0 if success or -1 if fails
+        """
+        choice = inquirer.select(message='Choose a host:', choices=['Connect', 'Delete']).execute()
+
+        match choice:
+            case 'Connect':
+                self.connect_to_host(host)
+            case 'Delete':
+                confirm = inquirer.confirm(f'Delete {host.conn_name}:').execute()
+
+                if confirm:
+                    self.inventory.remove_host(host)
+                    self.back_to_screen(self.screens['collections'])
+                else:
+                    self.back_to_screen(self.screens['collections'])
 
         return 0
 
