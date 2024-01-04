@@ -1,1 +1,2 @@
 src/db_ssh.sqlite3
+src/classes/__pycache__/*
