@@ -71,7 +71,9 @@ class Menu:
                 message="Connection name:", validate=EmptyInputValidator()
             ).execute()
 
-            user = inquirer.text(message="Username:", validate=EmptyInputValidator()).execute()
+            user = inquirer.text(
+                message="Username:", validate=EmptyInputValidator()
+            ).execute()
 
             ip = inquirer.text(message="IP:", validate=EmptyInputValidator()).execute()
 
@@ -90,7 +92,8 @@ class Menu:
                 self.main_menu()
             else:
                 choice = inquirer.select(
-                    message='What do you want to do:', choices=['Back to main menu', 'Add new host']
+                    message='What do you want to do:',
+                    choices=['Back to main menu', 'Add new host'],
                 ).execute()
 
                 if choice == 'Back to main menu':
@@ -103,7 +106,7 @@ class Menu:
 
     def collections(self):
         """
-        Description: Instantiates the InventoryHandle class, retrieves the names of all collections, and presents a menu 
+        Description: Instantiates the InventoryHandle class, retrieves the names of all collections, and presents a menu
          with the names of the collections.
         Params:
         Return: The option choosed (Should be a collection name) or -1 if has no collection in database
@@ -142,7 +145,9 @@ class Menu:
             choices = [host.conn_name for host in hosts]
             choices.append('Back')
 
-            host_choice = inquirer.select(message='Choose a host:', choices=choices).execute()
+            host_choice = inquirer.select(
+                message='Choose a host:', choices=choices
+            ).execute()
 
             if host_choice == 'Back':
                 self.back_to_screen(self.screens['collections'])
@@ -179,7 +184,9 @@ class Menu:
         Parameters:
         Return: 0 if success or -1 if fails
         """
-        choice = inquirer.select(message='Choose a host:', choices=['Connect', 'Delete']).execute()
+        choice = inquirer.select(
+            message='Choose a host:', choices=['Connect', 'Delete']
+        ).execute()
 
         match choice:
             case 'Connect':
@@ -206,5 +213,4 @@ class Menu:
             self.main_menu(logo=True)
         except Exception:
             return -1
-
         return 0
